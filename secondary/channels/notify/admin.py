@@ -56,7 +56,7 @@ class ContactGroupStatusAdmin(admin.ModelAdmin):
 admin.site.register(ContactGroupStatus, ContactGroupStatusAdmin)
 
 class ContactGroupAdmin(admin.ModelAdmin):
-	list_display = ('id','name', 'description','institution','gateway','status',)
+	list_display = ('id','name', 'description','institution','gateway','status','channel',)
 admin.site.register(ContactGroup, ContactGroupAdmin)
 
 class RecipientAdmin(admin.ModelAdmin):
@@ -128,7 +128,7 @@ class SessionSubscriptionTypeAdmin(admin.ModelAdmin):
 admin.site.register(SessionSubscriptionType, SessionSubscriptionTypeAdmin)
 
 class SessionSubscriptionAdmin(admin.ModelAdmin):
-    list_display = ('gateway_profile','enrollment', 'session_subscription_type','last_access','status','recipient','sends',)
+    list_display = ('id','gateway_profile','expiry','enrollment_type', 'session_subscription_type','last_access','status','recipient','sends',)
 admin.site.register(SessionSubscription, SessionSubscriptionAdmin)
 
 

@@ -142,6 +142,7 @@ class ContactGroup(models.Model):
 	institution = models.ForeignKey(Institution, blank=True, null=True, on_delete=models.CASCADE)
 	gateway = models.ForeignKey(Gateway, blank=True, null=True, on_delete=models.CASCADE)
 	status = models.ForeignKey(ContactGroupStatus, on_delete=models.CASCADE) 
+	channel = models.ForeignKey(Channel, on_delete=models.CASCADE)
 	def __str__(self):
 		return u'%s' % (self.name)
 
@@ -296,7 +297,8 @@ class SessionSubscription(models.Model):
 	date_modified  = models.DateTimeField(auto_now=True)
 	date_created = models.DateTimeField(auto_now_add=True)
 	gateway_profile = models.ForeignKey(GatewayProfile, on_delete=models.CASCADE)
-	enrollment = models.ForeignKey(Enrollment, on_delete=models.CASCADE)
+	expiry = models.DateTimeField()
+	enrollment_type = models.ForeignKey(EnrollmentType, on_delete=models.CASCADE)
 	session_subscription_type = models.ForeignKey(SessionSubscriptionType, on_delete=models.CASCADE)
 	last_access = models.DateTimeField()
 	status = models.ForeignKey(SessionSubscriptionStatus, on_delete=models.CASCADE)
