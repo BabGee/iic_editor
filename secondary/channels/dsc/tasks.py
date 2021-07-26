@@ -186,9 +186,7 @@ class Wrappers:
 			# model_class = globals()[data.query.model_name]
 
 			duration_days_filters = data.query.duration_days_filters
-			date_time_filters = data.query.date_time_filters
 			date_filters = data.query.date_filters
-			duration_seconds_filters = data.query.duration_seconds_filters
 			duration_hours_filters = data.query.duration_hours_filters
 			token_filters = data.query.token_filters
 
@@ -215,9 +213,7 @@ class Wrappers:
 
 			values_data = {}
 			duration_days_filter_data = {}
-			date_time_filter_data = {}
 			date_filter_data = {}
-			duration_seconds_filter_data = {}
 			duration_hours_filter_data = {}
 			token_filters_data = {}
 
@@ -380,38 +376,6 @@ class Wrappers:
 
 
 			#lgr.info('Duration Days Filters Report List Count: %s' % len(report_list))
-			if duration_seconds_filters not in ['',None]:
-				for i in duration_seconds_filters.split("|"):
-					dsf_list = i.split('%')
-					if len(dsf_list)==2:
-						if dsf_list[0] in payload.keys() and getattr(model_class, dsf_list[1].split('__')[0], False):
-							try:duration_seconds_filter_data[dsf_list[1]] = pytz.timezone(gateway_profile.user.profile.timezone).localize(datetime.strptime(payload[dsf_list[0]], '%Y-%m-%d'))
-							except Exception as e: lgr.info('Error on duration seconds filter : %s' % e)
-						elif getattr(model_class, dsf_list[0].split('__')[0], False) and getattr(model_class, dsf_list[1].split('__')[0].replace('-',''), False):
-							try:
-								if dsf_list[1][:1] == '-':duration_seconds_filter_data[dsf_list[0]] = timezone.now()-timezone.timedelta(seconds=1)*F(dsf_list[1][1:]) if dsf_list[1] not in ['',None] else None
-								else: duration_seconds_filter_data[dsf_list[0]] = timezone.now()+timezone.timedelta(seconds=1)*F(dsf_list[1]) if dsf_list[1] not in ['',None] else None
-							except Exception as e: lgr.info('Error on duration seconds filter : %s' % e)
-						elif getattr(model_class, dsf_list[0].split('__')[0], False):
-							try: duration_seconds_filter_data[dsf_list[0]] = timezone.now()+timezone.timedelta(seconds=float(dsf_list[1])) if dsf_list[1] not in ['',None] else None
-							except Exception as e: lgr.info('Error on duration seconds filter : %s' % e)
-					elif getattr(model_class, dsf_list[0].split('__')[0], False):
-						if dsf_list[0] in payload.keys():
-							try:duration_seconds_filter_data[dsf_list[0]] =  timezone.now()+timezone.timedelta(seconds=float(payload[dsf_list[0]])) if payload[dsf_list[0]] not in ['',None] else None
-							except Exception as e: lgr.info('Error on duration seconds filter : %s' % e)
-						else:
-							try: duration_seconds_filter_data[dsf_list[0]] = timezone.now()+timezone.timedelta(seconds=float(dsf_list[1])) if dsf_list[1] not in ['',None] else None
-							except Exception as e: lgr.info('Error on duration seconds filter : %s' % e)
-
-				if len(duration_seconds_filter_data):
-					query = reduce(operator.and_, (Q(k) for k in duration_seconds_filter_data.items()))
-					#lgr.info('Query: %s' % query)
-
-					report_list = report_list.filter(query)
-
-				#q_list = [Q(**{f:q}) for f in field_lookups]
-
-			#lgr.info('Duration Seconds Filters Report List Count: %s' % len(report_list))
 			if duration_hours_filters not in ['',None]:
 				for i in duration_hours_filters.split("|"):
 					try:k,v = i.split('%')
@@ -428,46 +392,6 @@ class Wrappers:
 				#q_list = [Q(**{f:q}) for f in field_lookups]
 
 			#lgr.info('Duration Hours Filters Report List Count: %s' % len(report_list))
-			if date_time_filters not in ['',None]:
-				#lgr.info('Date Filters')
-				for i in date_time_filters.split("|"):
-					dtf_list = i.split('%')
-					if len(dtf_list)==2:
-						if dtf_list[0] in payload.keys() and getattr(model_class, dtf_list[1].split('__')[0], False):
-							try:date_time_filter_data[dtf_list[1]] = pytz.timezone(gateway_profile.user.profile.timezone).localize(datetime.strptime(payload[dtf_list[0]], '%Y-%m-%d'))
-							except Exception as e: lgr.info('Error on date filter 1: %s' % e)
-						elif getattr(model_class, dtf_list[0].split('__')[0], False):
-							k,v = dtf_list
-							if v.strip().lower() == 'timezone.now':
-								v = timezone.now().date().isoformat()
-							try:date_time_filter_data[k] = pytz.timezone(gateway_profile.user.profile.timezone).localize(datetime.strptime(v, '%Y-%m-%d')) if v not in ['',None] else None
-							except Exception as e: lgr.info('Error on date filter 2: %s' % e)
-
-					elif getattr(model_class, dtf_list[0].split('__')[0], False):
-						if dtf_list[0] in payload.keys():
-							try:date_time_filter_data[dtf_list[0]] = pytz.timezone(gateway_profile.user.profile.timezone).localize(datetime.strptime(payload[dtf_list[0]], '%Y-%m-%d')) if payload[dtf_list[0]] not in ['',None] else None
-							except Exception as e: lgr.info('Error on date filter 3: %s' % e)
-						elif 'start_date' in payload.keys() or 'end_date' in payload.keys():
-							if 'start_date' in payload.keys():
-								try:date_time_filter_data[i+'__gte'] = pytz.timezone(gateway_profile.user.profile.timezone).localize(datetime.strptime(payload['start_date'], '%Y-%m-%d')) if payload['start_date'] not in ['',None] else None
-								except Exception as e: lgr.info('Error on date filter 4: %s' % e)
-							if 'end_date' in payload.keys():
-								try:date_time_filter_data[i+'__lt'] = pytz.timezone(gateway_profile.user.profile.timezone).localize(datetime.strptime(payload['end_date'], '%Y-%m-%d'))+timezone.timedelta(days=1) if payload['end_date'] not in ['',None] else None
-								except Exception as e: lgr.info('Error on date filter 5: %s' % e)
-
-
-				if len(date_time_filter_data):
-						#lgr.info('Date Filter Data: %s' % date_time_filter_data)
-					for k,v in date_time_filter_data.items(): 
-						try:lgr.info('Date Data: %s' % v.isoformat())
-						except: pass
-						query = reduce(operator.and_, (Q(k) for k in date_time_filter_data.items()))
-						#lgr.info('Query: %s' % query)
-						report_list = report_list.filter(query)
-
-
-			#lgr.info('Query Str 3: %s' % report_list.query.__str__())
-			#lgr.info('Date Time Filters Report List Count: %s' % len(report_list))
 			if date_filters not in ['',None]:
 				#lgr.info('Date Filters')
 				for i in date_filters.split("|"):
@@ -485,7 +409,7 @@ class Wrappers:
 
 					elif getattr(model_class, df_list[0].split('__')[0], False):
 						if df_list[0] in payload.keys():
-							try:date_filter_data[df_list[0]] = pytz.timezone(gateway_profile.user.profile.timezone).localize(datetime.strptime(payload[df_list[0]], '%Y-%m-%d')) if payload[df_list[0]] not in ['',None] else None
+							try:date_filter_data[df_list[0]] = pytz.timezone(gateway_profile.user.profile.timezone).localize(datetime.strptime(payload[df_list[0]], '%Y-%m-%d')) if payload[i] not in ['',None] else None
 							except Exception as e: lgr.info('Error on date filter 3: %s' % e)
 						elif 'start_date' in payload.keys() or 'end_date' in payload.keys():
 							if 'start_date' in payload.keys():
@@ -506,7 +430,7 @@ class Wrappers:
 						report_list = report_list.filter(query)
 
 
-			#lgr.info('Query Str 3.1: %s' % report_list.query.__str__())
+			#lgr.info('Query Str 3: %s' % report_list.query.__str__())
 			#lgr.info('Date Filters Report List Count: %s' % len(report_list))
 			if token_filters not in ['',None]:
 				for f in token_filters.split("|"):

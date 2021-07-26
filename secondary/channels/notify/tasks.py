@@ -2431,6 +2431,7 @@ class System(Wrappers):
 				session_gateway_profile_list = GatewayProfile.objects.filter(msisdn=msisdn,\
 							 gateway=notification_product[0].notification.code.gateway)
 				if len(session_gateway_profile_list)>0:
+                    
 					session_gateway_profile = session_gateway_profile_list[0]
 
 					lgr.info('Session Gateway Profile: %s' % session_gateway_profile)
